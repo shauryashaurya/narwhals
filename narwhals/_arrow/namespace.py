@@ -13,7 +13,7 @@ from narwhals._arrow.expr import ArrowExpr
 from narwhals._arrow.selectors import ArrowSelectorNamespace
 from narwhals._arrow.series import ArrowSeries
 from narwhals._arrow.utils import cast_to_comparable_string_types
-from narwhals._compliant import CompliantThen, EagerNamespace, EagerWhen
+from narwhals._compliant import CompliantThen, EagerImplNamespace, EagerImplWhen
 from narwhals._expression_parsing import (
     combine_alias_output_names,
     combine_evaluate_output_names,
@@ -30,7 +30,9 @@ if TYPE_CHECKING:
 
 
 class ArrowNamespace(
-    EagerNamespace[ArrowDataFrame, ArrowSeries, ArrowExpr, pa.Table, "ChunkedArrayAny"]
+    EagerImplNamespace[
+        ArrowDataFrame, ArrowSeries, ArrowExpr, pa.Table, "ChunkedArrayAny"
+    ]
 ):
     _implementation = Implementation.PYARROW
 
@@ -279,7 +281,7 @@ class ArrowNamespace(
         )
 
 
-class ArrowWhen(EagerWhen[ArrowDataFrame, ArrowSeries, ArrowExpr, "ChunkedArrayAny"]):
+class ArrowWhen(EagerImplWhen[ArrowDataFrame, ArrowSeries, ArrowExpr, "ChunkedArrayAny"]):
     @property
     def _then(self) -> type[ArrowThen]:
         return ArrowThen

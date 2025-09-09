@@ -7,7 +7,7 @@ import pyarrow as pa
 import pyarrow.compute as pc
 
 from narwhals._arrow.utils import cast_to_comparable_string_types, extract_py_scalar
-from narwhals._compliant import EagerGroupBy
+from narwhals._compliant import EagerImplGroupBy
 from narwhals._expression_parsing import evaluate_output_names_and_aliases
 from narwhals._utils import generate_temporary_column_name
 
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from narwhals.typing import UniqueKeepStrategy
 
 
-class ArrowGroupBy(EagerGroupBy["ArrowDataFrame", "ArrowExpr", "Aggregation"]):
+class ArrowGroupBy(EagerImplGroupBy["ArrowDataFrame", "ArrowExpr", "Aggregation"]):
     _REMAP_AGGS: ClassVar[Mapping[NarwhalsAggregation, Aggregation]] = {
         "sum": "sum",
         "mean": "mean",

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 import pyarrow.compute as pc
 
 from narwhals._arrow.series import ArrowSeries
-from narwhals._compliant import EagerExpr
+from narwhals._compliant import EagerImplExpr
 from narwhals._expression_parsing import evaluate_output_names_and_aliases
 from narwhals._utils import (
     Implementation,
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from narwhals._utils import Version, _LimitedContext
 
 
-class ArrowExpr(EagerExpr["ArrowDataFrame", ArrowSeries]):
+class ArrowExpr(EagerImplExpr["ArrowDataFrame", ArrowSeries]):
     _implementation: Implementation = Implementation.PYARROW
 
     def __init__(

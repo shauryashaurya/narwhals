@@ -9,7 +9,7 @@ import pyarrow.compute as pc
 
 from narwhals._arrow.series import ArrowSeries
 from narwhals._arrow.utils import native_to_narwhals_dtype
-from narwhals._compliant import EagerDataFrame
+from narwhals._compliant import EagerImplDataFrame
 from narwhals._expression_parsing import ExprKind
 from narwhals._utils import (
     Implementation,
@@ -77,7 +77,7 @@ if TYPE_CHECKING:
 
 
 class ArrowDataFrame(
-    EagerDataFrame["ArrowSeries", "ArrowExpr", "pa.Table", "ChunkedArrayAny"]
+    EagerImplDataFrame["ArrowSeries", "ArrowExpr", "pa.Table", "ChunkedArrayAny"]
 ):
     _implementation = Implementation.PYARROW
 

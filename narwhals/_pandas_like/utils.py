@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Callable, Literal, TypeVar, cast
 
 import pandas as pd
 
-from narwhals._compliant import EagerSeriesNamespace
+from narwhals._compliant import EagerImplSeriesNamespace
 from narwhals._constants import (
     MS_PER_SECOND,
     NS_PER_MICROSECOND,
@@ -680,4 +680,4 @@ def import_array_module(implementation: Implementation, /) -> ModuleType:
     raise AssertionError(msg)
 
 
-class PandasLikeSeriesNamespace(EagerSeriesNamespace["PandasLikeSeries", Any]): ...
+class PandasLikeSeriesNamespace(EagerImplSeriesNamespace["PandasLikeSeries", Any]): ...

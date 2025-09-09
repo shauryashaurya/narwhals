@@ -6,7 +6,7 @@ from functools import reduce
 from itertools import chain
 from typing import TYPE_CHECKING, Any, Literal, Protocol, overload
 
-from narwhals._compliant import CompliantThen, EagerNamespace, EagerWhen
+from narwhals._compliant import CompliantThen, EagerImplNamespace, EagerImplWhen
 from narwhals._expression_parsing import (
     combine_alias_output_names,
     combine_evaluate_output_names,
@@ -42,7 +42,7 @@ HORIZONTAL: _Horizontal = 1
 
 
 class PandasLikeNamespace(
-    EagerNamespace[
+    EagerImplNamespace[
         PandasLikeDataFrame,
         PandasLikeSeries,
         PandasLikeExpr,
@@ -414,7 +414,7 @@ class _NativeConcat(Protocol[NativeDataFrameT, NativeSeriesT]):
 
 
 class PandasWhen(
-    EagerWhen[PandasLikeDataFrame, PandasLikeSeries, PandasLikeExpr, NativeSeriesT]
+    EagerImplWhen[PandasLikeDataFrame, PandasLikeSeries, PandasLikeExpr, NativeSeriesT]
 ):
     @property
     # Signature of "_then" incompatible with supertype "CompliantWhen"

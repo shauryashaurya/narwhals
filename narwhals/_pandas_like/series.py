@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 import numpy as np
 
-from narwhals._compliant import EagerSeries, EagerSeriesHist
+from narwhals._compliant import EagerImplSeries, EagerImplSeriesHist
 from narwhals._pandas_like.series_cat import PandasLikeSeriesCatNamespace
 from narwhals._pandas_like.series_dt import PandasLikeSeriesDateTimeNamespace
 from narwhals._pandas_like.series_list import PandasLikeSeriesListNamespace
@@ -107,7 +107,7 @@ PANDAS_TO_NUMPY_DTYPE_MISSING = {
 }
 
 
-class PandasLikeSeries(EagerSeries[Any]):
+class PandasLikeSeries(EagerImplSeries[Any]):
     def __init__(
         self, native_series: Any, *, implementation: Implementation, version: Version
     ) -> None:
@@ -1083,7 +1083,7 @@ class PandasLikeSeries(EagerSeries[Any]):
         return PandasLikeSeriesStructNamespace(self)
 
 
-class _PandasHist(EagerSeriesHist["pd.Series[Any]", "list[float]"]):
+class _PandasHist(EagerImplSeriesHist["pd.Series[Any]", "list[float]"]):
     _series: PandasLikeSeries
 
     def to_frame(self) -> PandasLikeDataFrame:

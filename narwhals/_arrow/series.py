@@ -23,7 +23,7 @@ from narwhals._arrow.utils import (
     pad_series,
     zeros,
 )
-from narwhals._compliant import EagerSeries, EagerSeriesHist
+from narwhals._compliant import EagerImplSeries, EagerImplSeriesHist
 from narwhals._expression_parsing import ExprKind
 from narwhals._typing_compat import assert_never
 from narwhals._utils import (
@@ -122,7 +122,7 @@ def maybe_extract_py_scalar(value: Any, return_py_scalar: bool) -> Any:  # noqa:
     return value
 
 
-class ArrowSeries(EagerSeries["ChunkedArrayAny"]):
+class ArrowSeries(EagerImplSeries["ChunkedArrayAny"]):
     _implementation = Implementation.PYARROW
 
     def __init__(
@@ -1105,7 +1105,9 @@ class ArrowSeries(EagerSeries["ChunkedArrayAny"]):
 
 
 class _ArrowHist(
-    EagerSeriesHist["ChunkedArrayAny", "list[ScalarAny] | pa.Int64Array | list[float]"]
+    EagerImplSeriesHist[
+        "ChunkedArrayAny", "list[ScalarAny] | pa.Int64Array | list[float]"
+    ]
 ):
     _series: ArrowSeries
 

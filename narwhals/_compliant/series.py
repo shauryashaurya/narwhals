@@ -12,8 +12,8 @@ from narwhals._compliant.any_namespace import (
 from narwhals._compliant.column import CompliantColumn
 from narwhals._compliant.typing import (
     CompliantSeriesT_co,
-    EagerDataFrameAny,
-    EagerSeriesT_co,
+    EagerImplDataFrameAny,
+    EagerImplSeriesT_co,
     NativeSeriesT,
     NativeSeriesT_co,
 )
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from typing_extensions import NotRequired, Self, TypedDict
 
     from narwhals._compliant.dataframe import CompliantDataFrame
-    from narwhals._compliant.namespace import EagerMinNamespace, EagerNamespace
+    from narwhals._compliant.namespace import EagerImplNamespace, EagerMinNamespace
     from narwhals._utils import Implementation, Version, _LimitedContext
     from narwhals.dtypes import DType
     from narwhals.series import Series
@@ -60,14 +60,14 @@ _CountsT_co = TypeVar("_CountsT_co", bound="Iterable[Any]", covariant=True)
 
 __all__ = [
     "CompliantSeries",
-    "EagerSeries",
-    "EagerSeriesCatNamespace",
-    "EagerSeriesDateTimeNamespace",
-    "EagerSeriesHist",
-    "EagerSeriesListNamespace",
-    "EagerSeriesNamespace",
-    "EagerSeriesStringNamespace",
-    "EagerSeriesStructNamespace",
+    "EagerImplSeries",
+    "EagerImplSeriesCatNamespace",
+    "EagerImplSeriesDateTimeNamespace",
+    "EagerImplSeriesHist",
+    "EagerImplSeriesListNamespace",
+    "EagerImplSeriesNamespace",
+    "EagerImplSeriesStringNamespace",
+    "EagerImplSeriesStructNamespace",
 ]
 
 
@@ -196,7 +196,7 @@ class CompliantSeries(
         ...
 
 
-class EagerSeries(CompliantSeries[NativeSeriesT], Protocol[NativeSeriesT]):
+class EagerImplSeries(CompliantSeries[NativeSeriesT], Protocol[NativeSeriesT]):
     _native_series: Any
     _implementation: Implementation
     _version: Version
@@ -242,7 +242,7 @@ class EagerSeries(CompliantSeries[NativeSeriesT], Protocol[NativeSeriesT]):
 
     def __narwhals_namespace__(
         self,
-    ) -> EagerNamespace[Any, Self, Any, Any, NativeSeriesT]: ...
+    ) -> EagerImplNamespace[Any, Self, Any, Any, NativeSeriesT]: ...
 
     def _gather(self, rows: SizedMultiIndexSelector[NativeSeriesT]) -> Self: ...
     def _gather_slice(self, rows: _SliceIndex | range) -> Self: ...
@@ -256,15 +256,15 @@ class EagerSeries(CompliantSeries[NativeSeriesT], Protocol[NativeSeriesT]):
         assert_never(item)
 
     @property
-    def str(self) -> EagerSeriesStringNamespace[Self, NativeSeriesT]: ...
+    def str(self) -> EagerImplSeriesStringNamespace[Self, NativeSeriesT]: ...
     @property
-    def dt(self) -> EagerSeriesDateTimeNamespace[Self, NativeSeriesT]: ...
+    def dt(self) -> EagerImplSeriesDateTimeNamespace[Self, NativeSeriesT]: ...
     @property
-    def cat(self) -> EagerSeriesCatNamespace[Self, NativeSeriesT]: ...
+    def cat(self) -> EagerImplSeriesCatNamespace[Self, NativeSeriesT]: ...
     @property
-    def list(self) -> EagerSeriesListNamespace[Self, NativeSeriesT]: ...
+    def list(self) -> EagerImplSeriesListNamespace[Self, NativeSeriesT]: ...
     @property
-    def struct(self) -> EagerSeriesStructNamespace[Self, NativeSeriesT]: ...
+    def struct(self) -> EagerImplSeriesStructNamespace[Self, NativeSeriesT]: ...
 
 
 class _SeriesNamespace(  # type: ignore[misc]
@@ -298,53 +298,53 @@ class _SeriesNamespace(  # type: ignore[misc]
         return self.compliant._with_native(series)
 
 
-class EagerSeriesNamespace(
-    _SeriesNamespace[EagerSeriesT_co, NativeSeriesT_co],
-    Generic[EagerSeriesT_co, NativeSeriesT_co],
+class EagerImplSeriesNamespace(
+    _SeriesNamespace[EagerImplSeriesT_co, NativeSeriesT_co],
+    Generic[EagerImplSeriesT_co, NativeSeriesT_co],
 ):
-    _compliant_series: EagerSeriesT_co
+    _compliant_series: EagerImplSeriesT_co
 
-    def __init__(self, series: EagerSeriesT_co, /) -> None:
+    def __init__(self, series: EagerImplSeriesT_co, /) -> None:
         self._compliant_series = series
 
 
-class EagerSeriesCatNamespace(  # type: ignore[misc]
-    _SeriesNamespace[EagerSeriesT_co, NativeSeriesT_co],
-    CatNamespace[EagerSeriesT_co],
-    Protocol[EagerSeriesT_co, NativeSeriesT_co],
+class EagerImplSeriesCatNamespace(  # type: ignore[misc]
+    _SeriesNamespace[EagerImplSeriesT_co, NativeSeriesT_co],
+    CatNamespace[EagerImplSeriesT_co],
+    Protocol[EagerImplSeriesT_co, NativeSeriesT_co],
 ): ...
 
 
-class EagerSeriesDateTimeNamespace(  # type: ignore[misc]
-    _SeriesNamespace[EagerSeriesT_co, NativeSeriesT_co],
-    DateTimeNamespace[EagerSeriesT_co],
-    Protocol[EagerSeriesT_co, NativeSeriesT_co],
+class EagerImplSeriesDateTimeNamespace(  # type: ignore[misc]
+    _SeriesNamespace[EagerImplSeriesT_co, NativeSeriesT_co],
+    DateTimeNamespace[EagerImplSeriesT_co],
+    Protocol[EagerImplSeriesT_co, NativeSeriesT_co],
 ): ...
 
 
-class EagerSeriesListNamespace(  # type: ignore[misc]
-    _SeriesNamespace[EagerSeriesT_co, NativeSeriesT_co],
-    ListNamespace[EagerSeriesT_co],
-    Protocol[EagerSeriesT_co, NativeSeriesT_co],
+class EagerImplSeriesListNamespace(  # type: ignore[misc]
+    _SeriesNamespace[EagerImplSeriesT_co, NativeSeriesT_co],
+    ListNamespace[EagerImplSeriesT_co],
+    Protocol[EagerImplSeriesT_co, NativeSeriesT_co],
 ): ...
 
 
-class EagerSeriesStringNamespace(  # type: ignore[misc]
-    _SeriesNamespace[EagerSeriesT_co, NativeSeriesT_co],
-    StringNamespace[EagerSeriesT_co],
-    Protocol[EagerSeriesT_co, NativeSeriesT_co],
+class EagerImplSeriesStringNamespace(  # type: ignore[misc]
+    _SeriesNamespace[EagerImplSeriesT_co, NativeSeriesT_co],
+    StringNamespace[EagerImplSeriesT_co],
+    Protocol[EagerImplSeriesT_co, NativeSeriesT_co],
 ): ...
 
 
-class EagerSeriesStructNamespace(  # type: ignore[misc]
-    _SeriesNamespace[EagerSeriesT_co, NativeSeriesT_co],
-    StructNamespace[EagerSeriesT_co],
-    Protocol[EagerSeriesT_co, NativeSeriesT_co],
+class EagerImplSeriesStructNamespace(  # type: ignore[misc]
+    _SeriesNamespace[EagerImplSeriesT_co, NativeSeriesT_co],
+    StructNamespace[EagerImplSeriesT_co],
+    Protocol[EagerImplSeriesT_co, NativeSeriesT_co],
 ): ...
 
 
-class EagerSeriesHist(Protocol[NativeSeriesT, _CountsT_co]):
-    _series: EagerSeries[NativeSeriesT]
+class EagerImplSeriesHist(Protocol[NativeSeriesT, _CountsT_co]):
+    _series: EagerImplSeries[NativeSeriesT]
     _breakpoint: bool
     _data: HistData[NativeSeriesT, _CountsT_co]
 
@@ -354,14 +354,14 @@ class EagerSeriesHist(Protocol[NativeSeriesT, _CountsT_co]):
 
     @classmethod
     def from_series(
-        cls, series: EagerSeries[NativeSeriesT], *, include_breakpoint: bool
+        cls, series: EagerImplSeries[NativeSeriesT], *, include_breakpoint: bool
     ) -> Self:
         obj = cls.__new__(cls)
         obj._series = series
         obj._breakpoint = include_breakpoint
         return obj
 
-    def to_frame(self) -> EagerDataFrameAny: ...
+    def to_frame(self) -> EagerImplDataFrameAny: ...
     def _linear_space(  # NOTE: Roughly `pl.linear_space`
         self,
         start: float,

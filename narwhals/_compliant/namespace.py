@@ -10,10 +10,10 @@ from narwhals._compliant.typing import (
     CompliantLazyFrameT,
     CompliantSeriesT_co,
     DepthTrackingExprT,
-    EagerDataFrameT,
-    EagerExprT,
+    EagerImplDataFrameT,
+    EagerImplExprT,
+    EagerImplSeriesT,
     EagerMinExprT,
-    EagerSeriesT,
     LazyExprT,
     NativeFrameT,
     NativeFrameT_co,
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from typing_extensions import TypeAlias
 
     from narwhals._compliant.selectors import CompliantSelectorNamespace
-    from narwhals._compliant.when_then import CompliantWhen, EagerWhen
+    from narwhals._compliant.when_then import CompliantWhen, EagerImplWhen
     from narwhals._utils import Implementation, Version
     from narwhals.expr import Expr
     from narwhals.series import Series
@@ -52,7 +52,7 @@ if TYPE_CHECKING:
 __all__ = [
     "CompliantNamespace",
     "DepthTrackingNamespace",
-    "EagerNamespace",
+    "EagerImplNamespace",
     "LazyNamespace",
 ]
 
@@ -185,26 +185,30 @@ class EagerMinNamespace(
         return self._series.from_numpy(data, context=self)
 
 
-class EagerNamespace(
-    EagerMinNamespace[EagerDataFrameT, EagerSeriesT, EagerExprT],
-    DepthTrackingNamespace[EagerDataFrameT, EagerExprT],
-    Protocol[EagerDataFrameT, EagerSeriesT, EagerExprT, NativeFrameT, NativeSeriesT],
+class EagerImplNamespace(
+    EagerMinNamespace[EagerImplDataFrameT, EagerImplSeriesT, EagerImplExprT],
+    DepthTrackingNamespace[EagerImplDataFrameT, EagerImplExprT],
+    Protocol[
+        EagerImplDataFrameT, EagerImplSeriesT, EagerImplExprT, NativeFrameT, NativeSeriesT
+    ],
 ):
     @property
     def _backend_version(self) -> tuple[int, ...]:
         return self._implementation._backend_version()
 
     def when(
-        self, predicate: EagerExprT
-    ) -> EagerWhen[EagerDataFrameT, EagerSeriesT, EagerExprT, NativeSeriesT]: ...
+        self, predicate: EagerImplExprT
+    ) -> EagerImplWhen[
+        EagerImplDataFrameT, EagerImplSeriesT, EagerImplExprT, NativeSeriesT
+    ]: ...
 
     @overload
-    def from_native(self, data: NativeFrameT, /) -> EagerDataFrameT: ...
+    def from_native(self, data: NativeFrameT, /) -> EagerImplDataFrameT: ...
     @overload
-    def from_native(self, data: NativeSeriesT, /) -> EagerSeriesT: ...
+    def from_native(self, data: NativeSeriesT, /) -> EagerImplSeriesT: ...
     def from_native(
         self, data: NativeFrameT | NativeSeriesT | Any, /
-    ) -> EagerDataFrameT | EagerSeriesT:
+    ) -> EagerImplDataFrameT | EagerImplSeriesT:
         if self._dataframe._is_native(data):
             return self._dataframe.from_native(data, context=self)
         if self._series._is_native(data):
@@ -218,7 +222,7 @@ class EagerNamespace(
         /,
         *,
         str_as_lit: bool,
-    ) -> EagerExprT | NonNestedLiteral:
+    ) -> EagerImplExprT | NonNestedLiteral:
         if not (is_series(data) or is_numpy_array(data)):
             return super().parse_into_expr(data, str_as_lit=str_as_lit)
         return self._expr._from_series(
@@ -233,8 +237,8 @@ class EagerNamespace(
     ) -> NativeFrameT: ...
     def _concat_vertical(self, dfs: Sequence[NativeFrameT], /) -> NativeFrameT: ...
     def concat(
-        self, items: Iterable[EagerDataFrameT], *, how: ConcatMethod
-    ) -> EagerDataFrameT:
+        self, items: Iterable[EagerImplDataFrameT], *, how: ConcatMethod
+    ) -> EagerImplDataFrameT:
         dfs = [item.native for item in items]
         if how == "horizontal":
             native = self._concat_horizontal(dfs)

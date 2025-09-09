@@ -12,7 +12,7 @@ from narwhals._compliant.typing import (
     CompliantFrameT_co,
     DepthTrackingExprAny,
     DepthTrackingExprT_contra,
-    EagerExprT_contra,
+    EagerImplExprT_contra,
     ImplExprT_contra,
     NarwhalsAggregation,
 )
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from narwhals._compliant.expr import ImplExpr
 
 
-__all__ = ["CompliantGroupBy", "DepthTrackingGroupBy", "EagerGroupBy"]
+__all__ = ["CompliantGroupBy", "DepthTrackingGroupBy", "EagerImplGroupBy"]
 
 NativeAggregationT_co = TypeVar(
     "NativeAggregationT_co", bound="str | Callable[..., Any]", covariant=True
@@ -173,8 +173,10 @@ class DepthTrackingGroupBy(
         return _RE_LEAF_NAME.sub("", expr._function_name)
 
 
-class EagerGroupBy(
-    DepthTrackingGroupBy[CompliantDataFrameT, EagerExprT_contra, NativeAggregationT_co],
-    DataFrameGroupBy[CompliantDataFrameT, EagerExprT_contra],
-    Protocol[CompliantDataFrameT, EagerExprT_contra, NativeAggregationT_co],
+class EagerImplGroupBy(
+    DepthTrackingGroupBy[
+        CompliantDataFrameT, EagerImplExprT_contra, NativeAggregationT_co
+    ],
+    DataFrameGroupBy[CompliantDataFrameT, EagerImplExprT_contra],
+    Protocol[CompliantDataFrameT, EagerImplExprT_contra, NativeAggregationT_co],
 ): ...

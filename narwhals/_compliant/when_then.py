@@ -7,9 +7,9 @@ from narwhals._compliant.typing import (
     CompliantExprAny,
     CompliantFrameAny,
     CompliantSeriesOrNativeExprAny,
-    EagerDataFrameT,
-    EagerExprT,
-    EagerSeriesT,
+    EagerImplDataFrameT,
+    EagerImplExprT,
+    EagerImplSeriesT,
     LazyExprAny,
     NativeSeriesT,
 )
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from narwhals.typing import NonNestedLiteral
 
 
-__all__ = ["CompliantThen", "CompliantWhen", "EagerWhen"]
+__all__ = ["CompliantThen", "CompliantWhen", "EagerImplWhen"]
 
 ExprT = TypeVar("ExprT", bound=CompliantExprAny)
 LazyExprT = TypeVar("LazyExprT", bound=LazyExprAny)
@@ -96,9 +96,9 @@ class CompliantThen(
         return cast("ExprT", self)
 
 
-class EagerWhen(
-    CompliantWhen[EagerDataFrameT, EagerSeriesT, EagerExprT],
-    Protocol[EagerDataFrameT, EagerSeriesT, EagerExprT, NativeSeriesT],
+class EagerImplWhen(
+    CompliantWhen[EagerImplDataFrameT, EagerImplSeriesT, EagerImplExprT],
+    Protocol[EagerImplDataFrameT, EagerImplSeriesT, EagerImplExprT, NativeSeriesT],
 ):
     def _if_then_else(
         self,
@@ -108,10 +108,10 @@ class EagerWhen(
         /,
     ) -> NativeSeriesT: ...
 
-    def __call__(self, df: EagerDataFrameT, /) -> Sequence[EagerSeriesT]:
+    def __call__(self, df: EagerImplDataFrameT, /) -> Sequence[EagerImplSeriesT]:
         is_expr = self._condition._is_expr
-        when: EagerSeriesT = self._condition(df)[0]
-        then: EagerSeriesT
+        when: EagerImplSeriesT = self._condition(df)[0]
+        then: EagerImplSeriesT
         align = when._align_full_broadcast
 
         if is_expr(self._then_value):

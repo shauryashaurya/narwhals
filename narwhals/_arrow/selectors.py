@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from narwhals._arrow.expr import ArrowExpr
-from narwhals._compliant import CompliantSelector, EagerSelectorNamespace
+from narwhals._compliant import CompliantSelector, EagerImplSelectorNamespace
 
 if TYPE_CHECKING:
     from narwhals._arrow.dataframe import ArrowDataFrame  # noqa: F401
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from narwhals._compliant.typing import ScalarKwargs
 
 
-class ArrowSelectorNamespace(EagerSelectorNamespace["ArrowDataFrame", "ArrowSeries"]):
+class ArrowSelectorNamespace(EagerImplSelectorNamespace["ArrowDataFrame", "ArrowSeries"]):
     @property
     def _selector(self) -> type[ArrowSelector]:
         return ArrowSelector

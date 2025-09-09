@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from narwhals._compliant import EagerExpr
+from narwhals._compliant import EagerImplExpr
 from narwhals._expression_parsing import evaluate_output_names_and_aliases
 from narwhals._pandas_like.group_by import PandasLikeGroupBy
 from narwhals._pandas_like.series import PandasLikeSeries
@@ -106,7 +106,7 @@ def window_kwargs_to_pandas_equivalent(
     return pandas_kwargs
 
 
-class PandasLikeExpr(EagerExpr["PandasLikeDataFrame", PandasLikeSeries]):
+class PandasLikeExpr(EagerImplExpr["PandasLikeDataFrame", PandasLikeSeries]):
     def __init__(
         self,
         call: EvalSeries[PandasLikeDataFrame, PandasLikeSeries],

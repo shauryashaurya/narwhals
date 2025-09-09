@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from narwhals._compliant import CompliantSelector, EagerSelectorNamespace
+from narwhals._compliant import CompliantSelector, EagerImplSelectorNamespace
 from narwhals._pandas_like.expr import PandasLikeExpr
 
 if TYPE_CHECKING:
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class PandasSelectorNamespace(
-    EagerSelectorNamespace["PandasLikeDataFrame", "PandasLikeSeries"]
+    EagerImplSelectorNamespace["PandasLikeDataFrame", "PandasLikeSeries"]
 ):
     @property
     def _selector(self) -> type[PandasSelector]:

@@ -9,8 +9,8 @@ from narwhals._compliant.typing import (
     CompliantExprT_contra,
     CompliantLazyFrameAny,
     CompliantSeriesT,
-    EagerExprT,
-    EagerSeriesT,
+    EagerImplExprT,
+    EagerImplSeriesT,
     NativeDataFrameT,
     NativeLazyFrameT,
     NativeSeriesT,
@@ -49,7 +49,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self, TypeAlias
 
     from narwhals._compliant.group_by import CompliantGroupBy, DataFrameGroupBy
-    from narwhals._compliant.namespace import EagerNamespace
+    from narwhals._compliant.namespace import EagerImplNamespace
     from narwhals._spark_like.utils import SparkSession
     from narwhals._translate import IntoArrowTable
     from narwhals._typing import _EagerAllowedImpl, _LazyAllowedImpl
@@ -77,7 +77,12 @@ if TYPE_CHECKING:
 
     Incomplete: TypeAlias = Any
 
-__all__ = ["CompliantDataFrame", "CompliantFrame", "CompliantLazyFrame", "EagerDataFrame"]
+__all__ = [
+    "CompliantDataFrame",
+    "CompliantFrame",
+    "CompliantLazyFrame",
+    "EagerImplDataFrame",
+]
 
 T = TypeVar("T")
 
@@ -295,13 +300,13 @@ class CompliantLazyFrame(
     def sink_parquet(self, file: str | Path | BytesIO) -> None: ...
 
 
-class EagerDataFrame(
+class EagerImplDataFrame(
     CompliantDataFrame[
-        EagerSeriesT, EagerExprT, NativeDataFrameT, "DataFrame[NativeDataFrameT]"
+        EagerImplSeriesT, EagerImplExprT, NativeDataFrameT, "DataFrame[NativeDataFrameT]"
     ],
-    CompliantLazyFrame[EagerExprT, "Incomplete", "DataFrame[NativeDataFrameT]"],
+    CompliantLazyFrame[EagerImplExprT, "Incomplete", "DataFrame[NativeDataFrameT]"],
     ValidateBackendVersion,
-    Protocol[EagerSeriesT, EagerExprT, NativeDataFrameT, NativeSeriesT],
+    Protocol[EagerImplSeriesT, EagerImplExprT, NativeDataFrameT, NativeSeriesT],
 ):
     @property
     def _backend_version(self) -> tuple[int, ...]:
@@ -309,17 +314,17 @@ class EagerDataFrame(
 
     def __narwhals_namespace__(
         self,
-    ) -> EagerNamespace[
-        Self, EagerSeriesT, EagerExprT, NativeDataFrameT, NativeSeriesT
+    ) -> EagerImplNamespace[
+        Self, EagerImplSeriesT, EagerImplExprT, NativeDataFrameT, NativeSeriesT
     ]: ...
 
     def to_narwhals(self) -> DataFrame[NativeDataFrameT]:
         return self._version.dataframe(self, level="full")
 
-    def aggregate(self, *exprs: EagerExprT) -> Self:
+    def aggregate(self, *exprs: EagerImplExprT) -> Self:
         # NOTE: Ignore intermittent [False Negative]
-        # Argument of type "EagerExprT@EagerDataFrame" cannot be assigned to parameter "exprs" of type "EagerExprT@EagerDataFrame" in function "select"
-        #  Type "EagerExprT@EagerDataFrame" is not assignable to type "EagerExprT@EagerDataFrame"
+        # Argument of type "EagerImplExprT@EagerImplDataFrame" cannot be assigned to parameter "exprs" of type "EagerImplExprT@EagerImplDataFrame" in function "select"
+        #  Type "EagerImplExprT@EagerImplDataFrame" is not assignable to type "EagerImplExprT@EagerImplDataFrame"
         return self.select(*exprs)  # pyright: ignore[reportArgumentType]
 
     def _with_native(
@@ -329,19 +334,19 @@ class EagerDataFrame(
     def _check_columns_exist(self, subset: Sequence[str]) -> ColumnNotFoundError | None:
         return check_columns_exist(subset, available=self.columns)
 
-    def _evaluate_expr(self, expr: EagerExprT, /) -> EagerSeriesT:
+    def _evaluate_expr(self, expr: EagerImplExprT, /) -> EagerImplSeriesT:
         """Evaluate `expr` and ensure it has a **single** output."""
-        result: Sequence[EagerSeriesT] = expr(self)
+        result: Sequence[EagerImplSeriesT] = expr(self)
         assert len(result) == 1  # debug assertion  # noqa: S101
         return result[0]
 
-    def _evaluate_into_exprs(self, *exprs: EagerExprT) -> Sequence[EagerSeriesT]:
+    def _evaluate_into_exprs(self, *exprs: EagerImplExprT) -> Sequence[EagerImplSeriesT]:
         # NOTE: Ignore intermittent [False Negative]
-        # Argument of type "EagerExprT@EagerDataFrame" cannot be assigned to parameter "expr" of type "EagerExprT@EagerDataFrame" in function "_evaluate_into_expr"
-        #  Type "EagerExprT@EagerDataFrame" is not assignable to type "EagerExprT@EagerDataFrame"
+        # Argument of type "EagerImplExprT@EagerImplDataFrame" cannot be assigned to parameter "expr" of type "EagerImplExprT@EagerImplDataFrame" in function "_evaluate_into_expr"
+        #  Type "EagerImplExprT@EagerImplDataFrame" is not assignable to type "EagerImplExprT@EagerImplDataFrame"
         return list(chain.from_iterable(self._evaluate_into_expr(expr) for expr in exprs))  # pyright: ignore[reportArgumentType]
 
-    def _evaluate_into_expr(self, expr: EagerExprT, /) -> Sequence[EagerSeriesT]:
+    def _evaluate_into_expr(self, expr: EagerImplExprT, /) -> Sequence[EagerImplSeriesT]:
         """Return list of raw columns.
 
         For eager backends we alias operations at each step.
@@ -360,7 +365,7 @@ class EagerDataFrame(
             raise AssertionError(msg)
         return result
 
-    def _extract_comparand(self, other: EagerSeriesT, /) -> Any:
+    def _extract_comparand(self, other: EagerImplSeriesT, /) -> Any:
         """Extract native Series, broadcasting to `len(self)` if necessary."""
         ...
 
@@ -383,8 +388,8 @@ class EagerDataFrame(
     def __getitem__(  # noqa: C901, PLR0912
         self,
         item: tuple[
-            SingleIndexSelector | MultiIndexSelector[EagerSeriesT],
-            MultiColSelector[EagerSeriesT],
+            SingleIndexSelector | MultiIndexSelector[EagerImplSeriesT],
+            MultiColSelector[EagerImplSeriesT],
         ],
     ) -> Self:
         rows, columns = item

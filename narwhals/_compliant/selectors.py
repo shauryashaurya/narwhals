@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 __all__ = [
     "CompliantSelector",
     "CompliantSelectorNamespace",
-    "EagerSelectorNamespace",
+    "EagerImplSelectorNamespace",
     "LazySelectorNamespace",
 ]
 
@@ -166,7 +166,7 @@ class CompliantSelectorNamespace(Protocol[FrameT, SeriesOrExprT]):
         return self._selector.from_callables(series, names, context=self)
 
 
-class EagerSelectorNamespace(
+class EagerImplSelectorNamespace(
     CompliantSelectorNamespace[DataFrameT, SeriesT], Protocol[DataFrameT, SeriesT]
 ):
     def _iter_schema(self, df: DataFrameT, /) -> Iterator[tuple[str, DType]]:

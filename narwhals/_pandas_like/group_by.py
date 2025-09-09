@@ -6,7 +6,7 @@ from itertools import chain
 from operator import methodcaller
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
-from narwhals._compliant import EagerGroupBy
+from narwhals._compliant import EagerImplGroupBy
 from narwhals._exceptions import issue_warning
 from narwhals._expression_parsing import evaluate_output_names_and_aliases
 from narwhals._utils import zip_strict
@@ -183,7 +183,7 @@ class AggExpr:
 
 
 class PandasLikeGroupBy(
-    EagerGroupBy["PandasLikeDataFrame", "PandasLikeExpr", NativeAggregation]
+    EagerImplGroupBy["PandasLikeDataFrame", "PandasLikeExpr", NativeAggregation]
 ):
     _REMAP_AGGS: ClassVar[Mapping[NarwhalsAggregation, NativeAggregation]] = {
         "sum": "sum",
