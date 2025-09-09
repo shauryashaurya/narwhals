@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from narwhals._expression_parsing import ExprKind, ExprMetadata
     from narwhals._polars.dataframe import Method
     from narwhals._polars.namespace import PolarsNamespace
+    from narwhals._polars.series import PolarsSeries
     from narwhals._utils import Version
     from narwhals.typing import IntoDType, ModeKeepStrategy, NumericLiteral
 
@@ -48,6 +49,10 @@ class PolarsExpr:
     @classmethod
     def from_column_indices(cls, *_: Any, **__: Any) -> Self:
         raise NotImplementedError
+
+    @classmethod
+    def _from_series(cls, series: PolarsSeries) -> PolarsExpr:
+        return series.__narwhals_namespace__().lit(series.native, None)
 
     def __narwhals_expr__(self) -> Self:  # pragma: no cover
         return self

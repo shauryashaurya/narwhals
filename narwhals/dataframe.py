@@ -51,7 +51,7 @@ from narwhals.exceptions import (
     InvalidOperationError,
     PerformanceWarning,
 )
-from narwhals.functions import _from_dict_no_backend, _is_into_schema, col, new_series
+from narwhals.functions import _from_dict_no_backend, _is_into_schema, col
 from narwhals.schema import Schema
 from narwhals.series import Series
 from narwhals.translate import to_native
@@ -133,6 +133,16 @@ class BaseFrame(Generic[_FrameT]):
     @property
     @abstractmethod
     def _compliant(self) -> Any: ...
+
+    # NOTE: Override in stable!
+    # or:
+    # - add `BaseFrame_version: ClassVar[Version]`
+    # - add `Version._expr`
+    @property
+    def _expr(self) -> type[Expr]:
+        from narwhals.expr import Expr
+
+        return Expr
 
     def __native_namespace__(self) -> ModuleType:
         return self._compliant_frame.__native_namespace__()  # type: ignore[no-any-return]
@@ -486,9 +496,9 @@ class DataFrame(BaseFrame[DataFrameT]):
         if isinstance(arg, str):
             return col(arg)
         if is_numpy_array_1d(arg):
-            return new_series("", arg, backend=self.implementation)._to_expr()
+            arg = self._series.from_numpy("", arg, backend=self.implementation)
         if is_series(arg):
-            return arg._to_expr()
+            return self._expr._from_series(arg)
         if is_expr(arg):
             return arg
         raise InvalidIntoExprError.from_invalid_type(type(arg))

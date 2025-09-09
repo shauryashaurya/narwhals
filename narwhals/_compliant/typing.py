@@ -16,6 +16,7 @@ if TYPE_CHECKING:
         CompliantExpr,
         DepthTrackingExpr,
         EagerExpr,
+        EagerMinExpr,
         ImplExpr,
         LazyExpr,
         NativeExpr,
@@ -82,6 +83,9 @@ CompliantNamespaceAny: TypeAlias = "CompliantNamespace[Any, Any]"
 ImplExprAny: TypeAlias = "ImplExpr[Any, Any]"
 
 DepthTrackingExprAny: TypeAlias = "DepthTrackingExpr[Any, Any]"
+
+EagerMinExprAny: TypeAlias = "EagerMinExpr[Any, Any]"
+EagerMinExprT = TypeVar("EagerMinExprT", bound=EagerMinExprAny)
 
 EagerDataFrameAny: TypeAlias = "EagerDataFrame[Any, Any, Any, Any]"
 EagerSeriesAny: TypeAlias = "EagerSeries[Any]"

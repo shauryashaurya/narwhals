@@ -4,12 +4,15 @@ from functools import partial
 from typing import TYPE_CHECKING, Any, Protocol, overload
 
 from narwhals._compliant.typing import (
+    CompliantDataFrameT,
     CompliantExprT,
     CompliantFrameT,
     CompliantLazyFrameT,
+    CompliantSeriesT_co,
     DepthTrackingExprT,
     EagerDataFrameT,
     EagerExprT,
+    EagerMinExprT,
     EagerSeriesT,
     LazyExprT,
     NativeFrameT,
@@ -155,7 +158,35 @@ class LazyNamespace(
         raise TypeError(msg)
 
 
+class EagerMinNamespace(
+    CompliantNamespace[CompliantDataFrameT, EagerMinExprT],
+    Protocol[CompliantDataFrameT, CompliantSeriesT_co, EagerMinExprT],
+):
+    @property
+    def _dataframe(self) -> type[CompliantDataFrameT]: ...
+    @property
+    def _series(self) -> type[CompliantSeriesT_co]: ...
+    @overload
+    def from_numpy(
+        self, data: Into1DArray, /, schema: None = ...
+    ) -> CompliantSeriesT_co: ...
+    @overload
+    def from_numpy(
+        self, data: _2DArray, /, schema: IntoSchema | Sequence[str] | None
+    ) -> CompliantDataFrameT: ...
+    def from_numpy(
+        self,
+        data: Into1DArray | _2DArray,
+        /,
+        schema: IntoSchema | Sequence[str] | None = None,
+    ) -> CompliantDataFrameT | CompliantSeriesT_co:
+        if is_numpy_array_2d(data):
+            return self._dataframe.from_numpy(data, schema=schema, context=self)
+        return self._series.from_numpy(data, context=self)
+
+
 class EagerNamespace(
+    EagerMinNamespace[EagerDataFrameT, EagerSeriesT, EagerExprT],
     DepthTrackingNamespace[EagerDataFrameT, EagerExprT],
     Protocol[EagerDataFrameT, EagerSeriesT, EagerExprT, NativeFrameT, NativeSeriesT],
 ):
@@ -163,10 +194,6 @@ class EagerNamespace(
     def _backend_version(self) -> tuple[int, ...]:
         return self._implementation._backend_version()
 
-    @property
-    def _dataframe(self) -> type[EagerDataFrameT]: ...
-    @property
-    def _series(self) -> type[EagerSeriesT]: ...
     def when(
         self, predicate: EagerExprT
     ) -> EagerWhen[EagerDataFrameT, EagerSeriesT, EagerExprT, NativeSeriesT]: ...
@@ -199,24 +226,6 @@ class EagerNamespace(
             if is_series(data)
             else self._series.from_numpy(data, context=self)
         )
-
-    @overload
-    def from_numpy(self, data: Into1DArray, /, schema: None = ...) -> EagerSeriesT: ...
-
-    @overload
-    def from_numpy(
-        self, data: _2DArray, /, schema: IntoSchema | Sequence[str] | None
-    ) -> EagerDataFrameT: ...
-
-    def from_numpy(
-        self,
-        data: Into1DArray | _2DArray,
-        /,
-        schema: IntoSchema | Sequence[str] | None = None,
-    ) -> EagerDataFrameT | EagerSeriesT:
-        if is_numpy_array_2d(data):
-            return self._dataframe.from_numpy(data, schema=schema, context=self)
-        return self._series.from_numpy(data, context=self)
 
     def _concat_diagonal(self, dfs: Sequence[NativeFrameT], /) -> NativeFrameT: ...
     def _concat_horizontal(

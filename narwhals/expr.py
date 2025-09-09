@@ -28,6 +28,7 @@ if TYPE_CHECKING:
 
     from narwhals._compliant import CompliantExpr, CompliantNamespace
     from narwhals.dtypes import DType
+    from narwhals.series import Series
     from narwhals.typing import (
         ClosedInterval,
         FillNullStrategy,
@@ -59,6 +60,23 @@ class Expr:
 
         self._to_compliant_expr: _ToCompliant = func
         self._metadata = metadata
+
+    # TODO @dangotbanned: Remove `metadata` from here and `_from_series`
+    # Replace with:
+    # ```py
+    #    metadata = expr._metadata or ExprMetadata.selector_single()  # noqa: ERA001
+    # ```
+    @classmethod
+    def _from_compliant(
+        cls, expr: CompliantExpr[Any, Any], metadata: ExprMetadata
+    ) -> Self:
+        return cls(lambda _plx: expr, metadata)
+
+    @classmethod
+    def _from_series(cls, series: Series[Any], /) -> Self:
+        compliant = series._compliant
+        expr = series._compliant.__narwhals_namespace__()._expr._from_series(compliant)
+        return cls._from_compliant(expr, ExprMetadata.selector_single())
 
     def _with_elementwise(self, to_compliant_expr: Callable[[Any], Any]) -> Self:
         return self.__class__(to_compliant_expr, self._metadata.with_elementwise_op())

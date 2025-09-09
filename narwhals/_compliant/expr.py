@@ -18,10 +18,12 @@ from narwhals._compliant.namespace import CompliantNamespace
 from narwhals._compliant.typing import (
     AliasName,
     AliasNames,
+    CompliantDataFrameT,
     CompliantExprT_co,
     CompliantFrameT,
     CompliantLazyFrameT,
     CompliantSeriesOrNativeExprT_co,
+    CompliantSeriesT,
     EagerDataFrameT,
     EagerExprT,
     EagerSeriesT,
@@ -41,7 +43,11 @@ if TYPE_CHECKING:
 
     from typing_extensions import Self, TypeIs
 
-    from narwhals._compliant.namespace import CompliantNamespace, EagerNamespace
+    from narwhals._compliant.namespace import (
+        CompliantNamespace,
+        EagerMinNamespace,
+        EagerNamespace,
+    )
     from narwhals._compliant.series import CompliantSeries
     from narwhals._compliant.typing import AliasNames, EvalNames, EvalSeries, ScalarKwargs
     from narwhals._expression_parsing import ExprKind, ExprMetadata
@@ -210,8 +216,27 @@ class DepthTrackingExpr(
         return f"{type(self).__name__}(depth={self._depth}, function_name={self._function_name})"
 
 
+class EagerMinExpr(
+    CompliantExpr[CompliantDataFrameT, CompliantSeriesT],
+    Protocol[CompliantDataFrameT, CompliantSeriesT],
+):
+    """Will be replacing `EagerExpr`!
+
+    Everything else in a `Eager*` class should become `EagerImpl*`
+
+    This plugs the gap of `CompliantSeries.__narwhals_namespace__` *not* having a `._series`
+    """
+
+    def __narwhals_namespace__(
+        self,
+    ) -> EagerMinNamespace[CompliantDataFrameT, CompliantSeriesT, Self]: ...
+    @classmethod
+    def _from_series(cls, series: CompliantSeriesT) -> Self: ...
+
+
 class EagerExpr(
     DepthTrackingExpr[EagerDataFrameT, EagerSeriesT],
+    EagerMinExpr[EagerDataFrameT, EagerSeriesT],
     Protocol[EagerDataFrameT, EagerSeriesT],
 ):
     _call: EvalSeries[EagerDataFrameT, EagerSeriesT]
