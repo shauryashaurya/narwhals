@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from typing_extensions import NotRequired, Self, TypedDict
 
     from narwhals._compliant.dataframe import CompliantDataFrame
-    from narwhals._compliant.namespace import EagerImplNamespace, EagerMinNamespace
+    from narwhals._compliant.namespace import EagerImplNamespace, EagerNamespace
     from narwhals._utils import Implementation, Version, _LimitedContext
     from narwhals.dtypes import DType
     from narwhals.series import Series
@@ -87,7 +87,7 @@ class CompliantSeries(
     def __narwhals_series__(self) -> Self:
         return self
 
-    def __narwhals_namespace__(self) -> EagerMinNamespace[Any, Self, Any]: ...
+    def __narwhals_namespace__(self) -> EagerNamespace[Any, Self, Any]: ...
     def __native_namespace__(self) -> ModuleType: ...
     @classmethod
     def from_native(cls, data: NativeSeriesT, /, *, context: _LimitedContext) -> Self: ...

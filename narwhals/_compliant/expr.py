@@ -46,7 +46,7 @@ if TYPE_CHECKING:
     from narwhals._compliant.namespace import (
         CompliantNamespace,
         EagerImplNamespace,
-        EagerMinNamespace,
+        EagerNamespace,
     )
     from narwhals._compliant.series import CompliantSeries
     from narwhals._compliant.typing import AliasNames, EvalNames, EvalSeries, ScalarKwargs
@@ -222,20 +222,15 @@ class DepthTrackingExpr(
         return f"{type(self).__name__}(depth={self._depth}, function_name={self._function_name})"
 
 
-class EagerMinExpr(
+class EagerExpr(
     CompliantExpr[CompliantDataFrameT, CompliantSeriesT],
     Protocol[CompliantDataFrameT, CompliantSeriesT],
 ):
-    """Will be replacing `EagerExpr`!
-
-    Everything else in a `Eager*` class should become `EagerImpl*`
-
-    This plugs the gap of `CompliantSeries.__narwhals_namespace__` *not* having a `._series`
-    """
+    """Plugs the gap of `CompliantSeries.__narwhals_namespace__` *not* having a `._series`."""
 
     def __narwhals_namespace__(
         self,
-    ) -> EagerMinNamespace[CompliantDataFrameT, CompliantSeriesT, Self]: ...
+    ) -> EagerNamespace[CompliantDataFrameT, CompliantSeriesT, Self]: ...
     @classmethod
     def _from_series(cls, series: CompliantSeriesT) -> Self:
         """TODO @dangotbanned: Rename to `from_series`.
@@ -247,7 +242,7 @@ class EagerMinExpr(
 
 class EagerImplExpr(
     DepthTrackingExpr[EagerImplDataFrameT, EagerImplSeriesT],
-    EagerMinExpr[EagerImplDataFrameT, EagerImplSeriesT],
+    EagerExpr[EagerImplDataFrameT, EagerImplSeriesT],
     Protocol[EagerImplDataFrameT, EagerImplSeriesT],
 ):
     _call: EvalSeries[EagerImplDataFrameT, EagerImplSeriesT]

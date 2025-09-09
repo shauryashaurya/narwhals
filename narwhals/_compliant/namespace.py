@@ -10,10 +10,10 @@ from narwhals._compliant.typing import (
     CompliantLazyFrameT,
     CompliantSeriesT_co,
     DepthTrackingExprT,
+    EagerExprT,
     EagerImplDataFrameT,
     EagerImplExprT,
     EagerImplSeriesT,
-    EagerMinExprT,
     LazyExprT,
     NativeFrameT,
     NativeFrameT_co,
@@ -158,9 +158,9 @@ class LazyNamespace(
         raise TypeError(msg)
 
 
-class EagerMinNamespace(
-    CompliantNamespace[CompliantDataFrameT, EagerMinExprT],
-    Protocol[CompliantDataFrameT, CompliantSeriesT_co, EagerMinExprT],
+class EagerNamespace(
+    CompliantNamespace[CompliantDataFrameT, EagerExprT],
+    Protocol[CompliantDataFrameT, CompliantSeriesT_co, EagerExprT],
 ):
     @property
     def _dataframe(self) -> type[CompliantDataFrameT]: ...
@@ -186,7 +186,7 @@ class EagerMinNamespace(
 
 
 class EagerImplNamespace(
-    EagerMinNamespace[EagerImplDataFrameT, EagerImplSeriesT, EagerImplExprT],
+    EagerNamespace[EagerImplDataFrameT, EagerImplSeriesT, EagerImplExprT],
     DepthTrackingNamespace[EagerImplDataFrameT, EagerImplExprT],
     Protocol[
         EagerImplDataFrameT, EagerImplSeriesT, EagerImplExprT, NativeFrameT, NativeSeriesT
