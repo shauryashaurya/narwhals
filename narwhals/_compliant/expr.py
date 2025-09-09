@@ -231,7 +231,12 @@ class EagerMinExpr(
         self,
     ) -> EagerMinNamespace[CompliantDataFrameT, CompliantSeriesT, Self]: ...
     @classmethod
-    def _from_series(cls, series: CompliantSeriesT) -> Self: ...
+    def _from_series(cls, series: CompliantSeriesT) -> Self:
+        """TODO @dangotbanned: Rename to `from_series`.
+
+        Not private, depended on in both narwhals + compliant levels.
+        """
+        ...
 
 
 class EagerExpr(
