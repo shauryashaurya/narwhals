@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from narwhals._compliant.expr import (
         CompliantExpr,
         DepthTrackingExpr,
-        EagerExpr,
         EagerImplExpr,
         ImplExpr,
         LazyExpr,
@@ -84,8 +83,6 @@ ImplExprAny: TypeAlias = "ImplExpr[Any, Any]"
 
 DepthTrackingExprAny: TypeAlias = "DepthTrackingExpr[Any, Any]"
 
-EagerExprAny: TypeAlias = "EagerExpr[Any, Any]"
-EagerExprT = TypeVar("EagerExprT", bound=EagerExprAny)
 
 EagerImplDataFrameAny: TypeAlias = "EagerImplDataFrame[Any, Any, Any, Any]"
 EagerImplSeriesAny: TypeAlias = "EagerImplSeries[Any]"

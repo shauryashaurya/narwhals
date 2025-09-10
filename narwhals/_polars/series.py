@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self, TypeAlias, TypeIs
 
     from narwhals._polars.dataframe import Method, PolarsDataFrame
+    from narwhals._polars.expr import PolarsExpr
     from narwhals._polars.namespace import PolarsNamespace
     from narwhals._utils import Version, _LimitedContext
     from narwhals.dtypes import DType
@@ -209,6 +210,9 @@ class PolarsSeries:
     def from_numpy(cls, data: Into1DArray, /, *, context: _LimitedContext) -> Self:
         native = pl.Series(data if is_numpy_array_1d(data) else [data])
         return cls.from_native(native, context=context)
+
+    def to_expr(self) -> PolarsExpr:
+        return self.__narwhals_namespace__().lit(self.native, None)
 
     def to_narwhals(self) -> Series[pl.Series]:
         return self._version.series(self, level="full")

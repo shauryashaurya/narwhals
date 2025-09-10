@@ -18,12 +18,10 @@ from narwhals._compliant.namespace import CompliantNamespace
 from narwhals._compliant.typing import (
     AliasName,
     AliasNames,
-    CompliantDataFrameT,
     CompliantExprT_co,
     CompliantFrameT,
     CompliantLazyFrameT,
     CompliantSeriesOrNativeExprT_co,
-    CompliantSeriesT,
     EagerImplDataFrameT,
     EagerImplExprT,
     EagerImplSeriesT,
@@ -43,11 +41,7 @@ if TYPE_CHECKING:
 
     from typing_extensions import Self, TypeIs
 
-    from narwhals._compliant.namespace import (
-        CompliantNamespace,
-        EagerImplNamespace,
-        EagerNamespace,
-    )
+    from narwhals._compliant.namespace import CompliantNamespace, EagerImplNamespace
     from narwhals._compliant.series import CompliantSeries
     from narwhals._compliant.typing import AliasNames, EvalNames, EvalSeries, ScalarKwargs
     from narwhals._expression_parsing import ExprKind, ExprMetadata
@@ -222,27 +216,8 @@ class DepthTrackingExpr(
         return f"{type(self).__name__}(depth={self._depth}, function_name={self._function_name})"
 
 
-class EagerExpr(
-    CompliantExpr[CompliantDataFrameT, CompliantSeriesT],
-    Protocol[CompliantDataFrameT, CompliantSeriesT],
-):
-    """Plugs the gap of `CompliantSeries.__narwhals_namespace__` *not* having a `._series`."""
-
-    def __narwhals_namespace__(
-        self,
-    ) -> EagerNamespace[CompliantDataFrameT, CompliantSeriesT, Self]: ...
-    @classmethod
-    def _from_series(cls, series: CompliantSeriesT) -> Self:
-        """TODO @dangotbanned: Rename to `from_series`.
-
-        Not private, depended on in both narwhals + compliant levels.
-        """
-        ...
-
-
 class EagerImplExpr(
     DepthTrackingExpr[EagerImplDataFrameT, EagerImplSeriesT],
-    EagerExpr[EagerImplDataFrameT, EagerImplSeriesT],
     Protocol[EagerImplDataFrameT, EagerImplSeriesT],
 ):
     _call: EvalSeries[EagerImplDataFrameT, EagerImplSeriesT]

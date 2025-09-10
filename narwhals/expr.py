@@ -70,9 +70,7 @@ class Expr:
 
     @classmethod
     def _from_series(cls, series: Series[Any], /) -> Self:
-        compliant = series._compliant
-        expr = series._compliant.__narwhals_namespace__()._expr._from_series(compliant)
-        return cls._from_compliant(expr)
+        return cls._from_compliant(series._compliant.to_expr())
 
     def _with_elementwise(self, to_compliant_expr: Callable[[Any], Any]) -> Self:
         return self.__class__(to_compliant_expr, self._metadata.with_elementwise_op())
